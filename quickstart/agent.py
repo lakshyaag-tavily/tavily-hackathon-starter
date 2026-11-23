@@ -114,11 +114,7 @@ def run_tool(tavily: TavilyClient, name: str, raw_args: str) -> dict:
         return tavily.search(**kwargs)
     if name == "tavily_extract":
         urls = args["urls"]
-        res = tavily.extract(urls=[urls] if isinstance(urls, str) else urls)
-        for item in res.get("results", []):
-            if len(item.get("raw_content", "")) > 8_000:
-                item["raw_content"] = item["raw_content"][:8_000] + "\n...[truncated]"
-        return res
+        return tavily.extract(urls=[urls] if isinstance(urls, str) else urls)
     return {"error": f"Unknown tool: {name}"}
 
 

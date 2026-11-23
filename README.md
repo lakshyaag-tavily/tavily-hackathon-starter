@@ -37,7 +37,8 @@ uv run quickstart/agent.py --compare
 uv run quickstart/agent.py "What shipped in the latest FastAPI release?"
 
 # 3. Deep Agents CLI script (planning + multi-step tool calling)
-uv run langchain-deepagents/agent.py --compare
+uv run langchain-deepagents/agent.py
+uv run langchain-deepagents/agent.py --no-web
 ```
 
 ## What's in the repo
@@ -55,7 +56,7 @@ uv run langchain-deepagents/agent.py --compare
 
 This repo already includes `.agents/skills/`, `.mcp.json`, and `AGENTS.md` so coding agents have live web access and up-to-date Tavily SDK docs while you build.
 
-To install Tavily globally across your coding agents ( installs `tvly`, signs in, and configures skills + MCP):
+To install Tavily globally across your coding agents (installs `tvly`, signs in, and configures skills + MCP):
 
 ```bash
 npx @tavily/cli init

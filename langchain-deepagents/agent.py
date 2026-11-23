@@ -3,7 +3,6 @@
 Run:
     uv run langchain-deepagents/agent.py
     uv run langchain-deepagents/agent.py "Write a competitive brief on Tavily."
-    uv run langchain-deepagents/agent.py --compare
     uv run langchain-deepagents/agent.py --no-web
 """
 
@@ -107,29 +106,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="LangChain Deep Agents + Tavily starter.")
     parser.add_argument("question", nargs="?", default=DEFAULT_QUESTION)
     parser.add_argument("--no-web", action="store_true", help="Disable Tavily web tools.")
-    parser.add_argument(
-        "--compare",
-        action="store_true",
-        help="Run the same question first without Tavily, then with Tavily.",
-    )
     parser.add_argument("--model", default=DEFAULT_MODEL, help="Nebius Token Factory model ID.")
     args = parser.parse_args()
 
     load_dotenv(find_dotenv())
-    check_env(require_tavily=args.compare or not args.no_web)
+    with_web = not args.no_web
+    check_env(require_tavily=with_web)
 
     console.print(f"[bold]Question:[/] {args.question}\n")
-    if args.compare:
-        base_agent = build_agent(with_web=False, model_name=args.model)
-        ask(base_agent, args.question, title=f"Without Tavily · {args.model}")
-        console.print()
-        web_agent = build_agent(with_web=True, model_name=args.model)
-        ask(web_agent, args.question, title=f"With Tavily · {args.model}")
-    else:
-        with_web = not args.no_web
-        agent = build_agent(with_web=with_web, model_name=args.model)
-        label = "With Tavily" if with_web else "Without Tavily"
-        ask(agent, args.question, title=f"{label} · {args.model}")
+    agent = build_agent(with_web=with_web, model_name=args.model)
+    label = "With Tavily" if with_web else "Without Tavily"
+    ask(agent, args.question, title=f"{label} · {args.model}")
 
 
 if __name__ == "__main__":
