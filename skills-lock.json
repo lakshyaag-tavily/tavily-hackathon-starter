@@ -1,0 +1,53 @@
+{
+  "version": 2,
+  "skills": {
+    "tavily-entity": {
+      "source": "tavily-ai/skills",
+      "commit": "90de383ad775f769692656ee8da4f935c2fb630b",
+      "sourceType": "github",
+      "skillPath": "skills/tasks/tavily-entity/SKILL.md",
+      "computedHash": "592f6bbb577b2c3bc27a9fd624450cd94df2abe2d8487aabce3aa4b8bc3abc76",
+      "installMode": "copy"
+    },
+    "tavily-list": {
+      "source": "tavily-ai/skills",
+      "commit": "90de383ad775f769692656ee8da4f935c2fb630b",
+      "sourceType": "github",
+      "skillPath": "skills/tasks/tavily-list/SKILL.md",
+      "computedHash": "295b833c822db021a74c79cf1117f1d276983a76de8efecbab52bce9c8d9c126",
+      "installMode": "copy"
+    },
+    "tavily-monitor": {
+      "source": "tavily-ai/skills",
+      "commit": "90de383ad775f769692656ee8da4f935c2fb630b",
+      "sourceType": "github",
+      "skillPath": "skills/tasks/tavily-monitor/SKILL.md",
+      "computedHash": "cbfe58db9e7c741e739f17d4d02e4f9b38e699db77418b2fa6111faa86a58cf0",
+      "installMode": "copy"
+    },
+    "tavily-research": {
+      "source": "tavily-ai/skills",
+      "commit": "90de383ad775f769692656ee8da4f935c2fb630b",
+      "sourceType": "github",
+      "skillPath": "skills/tasks/tavily-research/SKILL.md",
+      "computedHash": "7d9e8dfbd8e2461486fe46ae0784bc27e3421b5bee72b1cb83c89cc0b55676ff",
+      "installMode": "copy"
+    },
+    "tavily-sdk": {
+      "source": "tavily-ai/skills",
+      "commit": "90de383ad775f769692656ee8da4f935c2fb630b",
+      "sourceType": "github",
+      "skillPath": "skills/developers/tavily-sdk/SKILL.md",
+      "computedHash": "acfac8096f9d944511fe66c40c4f3fdeb446a43abc2c4cfb15aa25180e6c2b70",
+      "installMode": "copy"
+    },
+    "tavily-search": {
+      "source": "tavily-ai/skills",
+      "commit": "90de383ad775f769692656ee8da4f935c2fb630b",
+      "sourceType": "github",
+      "skillPath": "skills/core/tavily-search/SKILL.md",
+      "computedHash": "436935b29bc4265894782a7b78e566249e04679f49596a1bef9367bb54267c2e",
+      "installMode": "copy"
+    }
+  }
+}
