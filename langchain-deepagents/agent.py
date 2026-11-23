@@ -16,11 +16,12 @@ import time
 
 from deepagents import create_deep_agent
 from dotenv import find_dotenv, load_dotenv
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, ToolMessage
 from langchain_nebius import ChatNebius
 from langchain_tavily import TavilyExtract, TavilySearch
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.markup import escape
 from rich.panel import Panel
 
 TOKEN_FACTORY_URL = "https://api.tokenfactory.nebius.com/v1/"
@@ -64,8 +65,32 @@ def build_agent(*, with_web: bool = True, model_name: str = DEFAULT_MODEL):
     return create_deep_agent(model=model, system_prompt=system_prompt, tools=tools)
 
 
+def _truncate(value, max_chars: int = 60):
+    if isinstance(value, str):
+        text = " ".join(value.split())
+        return text if len(text) <= max_chars else text[: max_chars - 1] + "…"
+    if isinstance(value, dict):
+        return {k: _truncate(v, max_chars) for k, v in value.items() if v not in (None, [], "")}
+    if isinstance(value, list):
+        return [_truncate(v, max_chars) for v in value]
+    return value
+
+
+def _print_tool_result(name: str, content, indent: str = "") -> None:
+    if isinstance(content, str):
+        try:
+            content = json.loads(content)
+        except json.JSONDecodeError:
+            line = _truncate(content, 160)
+            console.print(f"{indent}[dim]← {name} {escape(line)}[/dim]", no_wrap=True, overflow="ellipsis")
+            return
+    data = content.get("results", content) if isinstance(content, dict) else content
+    line = json.dumps(_truncate(data), ensure_ascii=False)
+    console.print(f"{indent}[dim]← {name} {escape(line)}[/dim]", no_wrap=True, overflow="ellipsis")
+
+
 def ask(agent, question: str, *, title: str = "Agent") -> str:
-    """Stream the agent run, printing each tool call live as it fires."""
+    """Stream the agent run, printing each tool call and result live."""
     started = time.time()
     tool_calls = 0
     answer = ""
@@ -81,14 +106,15 @@ def ask(agent, question: str, *, title: str = "Agent") -> str:
             if not isinstance(partial, dict):
                 continue
             for msg in partial.get("messages") or []:
-                if not isinstance(msg, AIMessage):
-                    continue
-                for call in msg.tool_calls or []:
-                    tool_calls += 1
-                    args_str = json.dumps(call.get("args", {}), default=str)
-                    console.print(f"{indent}[cyan]→ {call['name']}[/cyan] [dim]{args_str}[/dim]")
-                if not namespace and not msg.tool_calls and msg.text.strip():
-                    answer = msg.text
+                if isinstance(msg, AIMessage):
+                    for call in msg.tool_calls or []:
+                        tool_calls += 1
+                        args_str = json.dumps(call.get("args", {}), default=str)
+                        console.print(f"{indent}[cyan]→ {call['name']}[/cyan] [dim]{args_str}[/dim]")
+                    if not namespace and not msg.tool_calls and msg.text.strip():
+                        answer = msg.text
+                elif isinstance(msg, ToolMessage):
+                    _print_tool_result(msg.name or "tool", msg.content, indent=indent)
 
     elapsed = time.time() - started
     console.print(

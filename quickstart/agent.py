@@ -19,11 +19,12 @@ from dotenv import find_dotenv, load_dotenv
 from openai import OpenAI
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.markup import escape
 from rich.panel import Panel
 from tavily import TavilyClient
 
 TOKEN_FACTORY_URL = "https://api.tokenfactory.nebius.com/v1/"
-DEFAULT_MODEL = "meta-models/muse-spark-open"  # Fallback: "moonshotai/Kimi-K2.5"
+DEFAULT_MODEL = "meta-models/muse-spark-open"
 DEFAULT_QUESTION = (
     "What are the three newest models on Nebius Token Factory, and when was each one added?"
 )
@@ -99,12 +100,29 @@ def check_env(require_tavily: bool = True) -> None:
         sys.exit(1)
 
 
+def _truncate(value, max_chars: int = 60):
+    if isinstance(value, str):
+        text = " ".join(value.split())
+        return text if len(text) <= max_chars else text[: max_chars - 1] + "…"
+    if isinstance(value, dict):
+        return {k: _truncate(v, max_chars) for k, v in value.items() if v not in (None, [], "")}
+    if isinstance(value, list):
+        return [_truncate(v, max_chars) for v in value]
+    return value
+
+
+def _print_tool_result(name: str, result) -> None:
+    data = result.get("results", result) if isinstance(result, dict) else result
+    line = json.dumps(_truncate(data), ensure_ascii=False)
+    console.print(f"[dim]← {name} {escape(line)}[/dim]", no_wrap=True, overflow="ellipsis")
+
+
 def run_tool(tavily: TavilyClient, name: str, raw_args: str) -> dict:
     args = json.loads(raw_args or "{}")
     if name == "tavily_search":
         kwargs: dict = {
             "query": args["query"],
-            "search_depth": "advanced",
+            "search_depth": "fast",
             "max_results": 5,
         }
         if args.get("time_range"):
@@ -163,6 +181,7 @@ def ask(
             )
             assert tavily is not None
             result = run_tool(tavily, call.function.name, call.function.arguments)
+            _print_tool_result(call.function.name, result)
             messages.append(
                 {
                     "role": "tool",
