@@ -1,67 +1,47 @@
-# Tavily agent starter
+# Tavily Agent Starter
 
-A starter pack for building AI agents that can search, read, crawl, and research the live web with [Tavily](https://tavily.com).
+A minimal starter repo for building AI agents with live web access via [Tavily](https://tavily.com).
 
-Every example builds the same agent twice: **without web access**, then **with Tavily**. Adding web access is one argument:
+Every example runs the same agent two ways: without web access, then with Tavily search and extract tools wired in. The whole point is to give you a clean base you can clone, run in two minutes, and fork into whatever you're building.
 
-```python
-agent = create_deep_agent(model=model, system_prompt=SYSTEM_PROMPT)
+## Setup
 
-web_agent = create_deep_agent(
-    model=model,
-    system_prompt=SYSTEM_PROMPT,
-    tools=[TavilySearch(max_results=5, search_depth="advanced"), TavilyExtract()],
-)
-```
+You'll need [uv](https://docs.astral.sh/uv/), a [Tavily API key](https://app.tavily.com/), and an API key for whichever model provider you want to use:
 
-## Quickstart
-
-You need [uv](https://docs.astral.sh/uv/), a [Tavily API key](https://app.tavily.com/) (`TAVILY_API_KEY`), and an API key for whichever model provider you're using:
-
-- `ANTHROPIC_API_KEY` from [Anthropic Console](https://console.anthropic.com/) for `quickstart/claude.py`
-- `NEBIUS_API_KEY` from [Nebius Token Factory](https://tokenfactory.nebius.com/) for `quickstart/agent.py` and `langchain-deepagents/`
+- **Claude (`quickstart/claude.py`):** `ANTHROPIC_API_KEY` from [Anthropic Console](https://console.anthropic.com/)
+- **Nebius Token Factory (`quickstart/agent.py`, `langchain-deepagents/`):** `NEBIUS_API_KEY` from [Nebius Token Factory](https://tokenfactory.nebius.com/)
 
 ```bash
-cp .env.example .env    # fill in TAVILY_API_KEY + ANTHROPIC_API_KEY or NEBIUS_API_KEY
+cp .env.example .env    # add TAVILY_API_KEY + your model key
 uv sync
 ```
 
-Pick how you want to run or fork it:
+## Where to start
+
+| Folder / File | What's inside | Best for |
+|---|---|---|
+| [`quickstart/`](quickstart/) | Plain Python tool-calling loops using `anthropic` (`claude.py`) or `openai` (`agent.py`) + `tavily-python` | Dropping into FastAPI, Slack/Discord bots, or custom scripts without an agent framework |
+| [`langchain-deepagents/`](langchain-deepagents/) | Interactive Jupyter notebook (`tavily_agent.ipynb`) and CLI script (`agent.py`) built on [LangChain Deep Agents](https://docs.langchain.com/oss/python/deepagents/overview) | Multi-step planning, sub-agents, and live walkthroughs |
+| [`IDEAS.md`](IDEAS.md) | 6 concrete project ideas paired with Tavily endpoints and starter prompts | Picking a build track and scaffolding fast with your coding agent |
+
+Quick smoke test once `.env` is ready:
 
 ```bash
-# 1. Zero-framework Claude script (Anthropic SDK + TavilyClient)
+# Claude + Tavily (runs without web, then with Tavily)
 uv run quickstart/claude.py --compare
-uv run quickstart/claude.py "What does PANW do?"
 
-# 2. Zero-framework Nebius script (OpenAI SDK + TavilyClient)
+# Nebius Token Factory + Tavily
 uv run quickstart/agent.py --compare
-uv run quickstart/agent.py "What shipped in the latest FastAPI release?"
 
-# 3. Interactive notebook (LangChain Deep Agents — best for walkthroughs)
+# LangChain Deep Agents notebook
 uv run jupyter lab langchain-deepagents/tavily_agent.ipynb
-
-# 4. Deep Agents CLI script (planning + multi-step tool calling)
-uv run langchain-deepagents/agent.py
-uv run langchain-deepagents/agent.py --no-web
 ```
 
-## What's in the repo
+## Using Tavily in your coding agent
 
-| Path | What it is |
-|---|---|
-| `quickstart/claude.py` | Minimal tool-calling loop using `anthropic` + `tavily-python` |
-| `quickstart/agent.py` | Minimal tool-calling loop using `openai` (Nebius Token Factory) + `tavily-python` |
-| `langchain-deepagents/tavily_agent.ipynb` | Interactive notebook: agent without vs. with Tavily, plus a competitor-brief use case |
-| `langchain-deepagents/agent.py` | Script & importable `build_agent()` version of the Deep Agents starter |
-| `.agents/skills/` | [Tavily skills](https://skills.tavily.com) (`tavily-search`, `tavily-sdk`, `tavily-research`, `tavily-entity`, `tavily-list`, `tavily-monitor`) |
-| `.mcp.json` | Hosted Tavily MCP server config for coding agents |
-| `AGENTS.md` / `CLAUDE.md` | Repo context + Tavily guidelines for coding agents |
+This repo ships with [`.agents/skills/`](.agents/skills/), [`.mcp.json`](.mcp.json), [`AGENTS.md`](AGENTS.md), and [`CLAUDE.md`](CLAUDE.md), so coding agents already have Tavily SDK docs and MCP config when you open the project.
 
-## Use Tavily from your coding agent
-
-This repo already includes `.agents/skills/`, `.mcp.json`, and `AGENTS.md` (`CLAUDE.md`) so coding agents have live web access and up-to-date Tavily SDK docs while you build.
-
-**Guided setup (Claude Code, Cursor, Codex)** — installs `tvly`, signs in, configures skills + MCP, and verifies a live search:
+If you want Tavily set up globally across your coding agents (Claude Code, Cursor, Codex):
 
 ```bash
 npx @tavily/cli init
@@ -70,56 +50,23 @@ npx @tavily/cli init
 npx @tavily/cli init --no-browser
 ```
 
-**Claude Code plugin** — adds the Tavily skills, hosted MCP server, and session hook directly inside Claude Code:
+**Using Claude Code?** You can also install the official plugin directly inside a session to get the skills, hosted MCP server, and session hook together:
 
 ```text
 /plugin install tavily --marketplace tavily-ai/skills
 ```
 
-Or from the official Anthropic marketplace: `claude plugin install tavily@claude-plugins-official`.
+Or from the Anthropic marketplace: `claude plugin install tavily@claude-plugins-official`.
 
-**Skills only** — install the core skills or add ready-made workflow skills from [skills.tavily.com](https://skills.tavily.com) (`tavily-lead-gen`, `tavily-competitor-analysis`, `tavily-due-diligence`, `tavily-market-research`, `tavily-meeting-prep`, `tavily-literature-review`):
+**Want just the skills (or ready-made workflows)?** Browse [skills.tavily.com](https://skills.tavily.com) or install from the CLI:
 
 ```bash
 npx skills add tavily-ai/skills -y
 npx skills add tavily-ai/official-workflows --skill tavily-competitor-analysis -y
 ```
 
-*Curious how Tavily compares to Claude's built-in web search? See [Tavily vs. Claude Web Search](https://www.tavily.com/blog/tavily-vs-claude-web-search-when-native-search-isn-t-enough).*
+Curious how Tavily stacks up against Claude's built-in web search? Read [Tavily vs. Claude Web Search](https://www.tavily.com/blog/tavily-vs-claude-web-search-when-native-search-isn-t-enough).
 
-## Ideas to build
+## License
 
-Each idea maps to specific Tavily endpoints and a reference skill in `.agents/skills/`. Paste any starter prompt into your coding agent inside this repo to scaffold it.
-
-1. **Fresh-facts assistant** (`search` with `search_depth="advanced"`, `time_range`)
-   Answer questions about this week's launches, funding, or live events with inline source citations.
-   > *Prompt:* `"Using quickstart/claude.py as a base, build a FastAPI endpoint that answers questions about tech news from the past 7 days with verified source URLs."`
-
-2. **Docs-grounded coding helper** (`map` + `crawl` with `instructions`, `select_paths`)
-   Map a library's docs site and crawl the relevant pages before generating code against newly released APIs.
-   > *Prompt:* `"Read .agents/skills/tavily-sdk/references/crawl.md and build a CLI tool that maps and crawls a documentation URL, then answers code questions grounded in those pages."`
-
-3. **Account & lead enrichment** (`search` + `extract` · pairs with `tavily-entity` / `tavily-lead-gen`)
-   Take a CSV or list of company names, disambiguate each entity, and return structured JSON records (product, pricing model, recent news, HQ) from official pages.
-   > *Prompt:* `"Read .agents/skills/tavily-entity/SKILL.md and .agents/skills/tavily-sdk/SKILL.md, then build a script that enriches a list of company names into structured Pydantic records."`
-
-4. **Competitor & changelog monitor** (`search` with `time_range="day"` / `include_domains` · pairs with `tavily-monitor` / `tavily-competitor-analysis`)
-   Track pricing pages, changelogs, and announcements across a list of competitors and report only what changed since the last run.
-   > *Prompt:* `"Read .agents/skills/tavily-monitor/SKILL.md and build a competitor monitor on langchain-deepagents/agent.py that diffs new pricing and changelog updates against a local JSON baseline."`
-
-5. **Deep research report generator** (`research` with `model="pro"` / `output_schema`, or parallel `SubAgent`s · pairs with `tavily-research`)
-   Produce a cited, decision-grade market or technical report—either via `TavilyClient().research()` or by dispatching specialist sub-agents in Deep Agents.
-   > *Prompt:* `"Read .agents/skills/tavily-sdk/references/research.md and build an app that runs Tavily research with a structured output_schema and renders a cited markdown report."`
-
-6. **Draft fact-checker** (`search` + `extract`)
-   Break a blog post or memo into discrete claims, verify each claim against primary sources, and flag `supported`, `contradicted`, or `unverified` with quotes.
-   > *Prompt:* `"Using quickstart/claude.py, build a CLI fact-checker that extracts claims from a markdown file, checks each one with Tavily search + extract, and outputs a cited verification table."`
-
-## Links
-
-- Tavily docs: https://docs.tavily.com
-- Tavily skills & workflows: https://skills.tavily.com
-- Tavily vs. Claude Web Search: https://www.tavily.com/blog/tavily-vs-claude-web-search-when-native-search-isn-t-enough
-- Anthropic Console: https://console.anthropic.com
-- Nebius Token Factory: https://tokenfactory.nebius.com
-- Deep Agents docs: https://docs.langchain.com/oss/python/deepagents/overview
+[MIT](LICENSE)

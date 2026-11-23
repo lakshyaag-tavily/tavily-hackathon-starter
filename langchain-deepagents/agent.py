@@ -25,7 +25,7 @@ from rich.markup import escape
 from rich.panel import Panel
 
 TOKEN_FACTORY_URL = "https://api.tokenfactory.nebius.com/v1/"
-DEFAULT_MODEL = "meta-models/muse-spark-open"  # Fallback: "moonshotai/Kimi-K2.5"
+DEFAULT_MODEL = "meta-models/muse-spark-open"  # Fallback: "reflection/beam"
 DEFAULT_QUESTION = (
     "What are the three newest models on Nebius Token Factory, and when was each one added?"
 )
